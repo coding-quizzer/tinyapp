@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/coding-quizzer/tinyapp/issues"
   },
-  "homepage": "https://github.com/coding-quizzer/tinyapp#readme"
+  "homepage": "https://github.com/coding-quizzer/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
 }
