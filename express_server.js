@@ -40,10 +40,18 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+app.get("/u/:id", (req, res) => {
+  const id = req.params.id;
+  const longURL = urlDatabase[id];
+  console.log("longURL", longURL);
+  res.redirect(longURL);
+})
+
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(6);
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
+  console.log('urls/shortURL', shortURL);
   res.redirect(`/urls/${shortURL}`);
 })
 
