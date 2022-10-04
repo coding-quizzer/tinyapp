@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 8080; //default port 8080
 
+
 app.set("view engine", "ejs");
 
 const urlDatabase = {
@@ -9,6 +10,12 @@ const urlDatabase = {
   "9sm5xK": "http://google.com"
 };
 
+const generateRandomString = function() {
+  // generates a random number between 0 and Z00000 base 36 and converts it to a string
+  return Math.floor(Math.random()*Math.pow(36, 6)).toString(36);
+};
+
+generateRandomString();
 app.use(express.urlencoded({extended: true}));
 
 app.get("/", (req, res) => {
