@@ -10,9 +10,9 @@ const urlDatabase = {
   "9sm5xK": "http://google.com"
 };
 
-const generateRandomString = function() {
-  // generates a random number between 0 and Z00000 base 36 and converts it to a string
-  return Math.floor(Math.random()*Math.pow(36, 6)).toString(36);
+const generateRandomString = function(len) {
+  // generates a random number between 0 and (36 ^ len) and converts it to a string, rendering it base 36
+  return Math.floor(Math.random()*Math.pow(36, len)).toString(36);
 };
 
 generateRandomString();
