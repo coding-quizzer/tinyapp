@@ -1,4 +1,5 @@
 const express = require("express");
+const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080; //default port 8080
 
@@ -16,9 +17,11 @@ const generateRandomString = function(len) {
 };
 
 generateRandomString();
+app.use(cookieParser());
 app.use(express.urlencoded({extended: true}));
 
 app.get("/", (req, res) => {
+  console.log(Object.keys(res));
   res.send("Hello!");
 });
 
