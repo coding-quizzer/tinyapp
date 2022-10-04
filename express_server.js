@@ -41,10 +41,11 @@ app.get("/hello", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  const shortURL = generateRandomString(6);
+  const id = generateRandomString(6);
   const longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
-  res.send("Ok");
+  const templateVars = { id: id, longURL: longURL};
+  urlDatabase[templateVars.id] = templateVars.longURL;
+  res.render("urls_show.ejs", templateVars);
 })
 
 app.listen(PORT, () => {
