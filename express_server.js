@@ -41,9 +41,7 @@ app.get("/hello", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  const id = generateRandomString(6);
-  const longURL = req.body.longURL;
-  const templateVars = { id: id, longURL: longURL};
+  const templateVars = { id: generateRandomString(6), longURL: req.body.longURL};
   urlDatabase[templateVars.id] = templateVars.longURL;
   res.render("urls_show.ejs", templateVars);
 })
