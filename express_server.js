@@ -21,7 +21,6 @@ app.use(cookieParser());
 app.use(express.urlencoded({extended: true}));
 
 app.get("/", (req, res) => {
-  console.log(Object.keys(res));
   res.send("Hello!");
 });
 
