@@ -20,6 +20,9 @@
       </div>
     </div>
     <form class="form-inline" method = POST action = /login>
+      <% if(username) { %>
+        <label for="username"> <%- username %> </label>
+      <% } %>
       <input
         class="form-control mr-sm-2"
         type="text"
