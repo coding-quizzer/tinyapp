@@ -20,9 +20,9 @@
       </div>
     </div>
     <% if(username) { %>
-        <p>Logged in as: <%- username %> </p>
+        <span class="align-middle">Logged in as: <%- username %> </span>
         <form action="/logout" method="POST" >
-          <button type="submit" class="btn btn-outline-dark">Logout</button>
+          <button type="submit" class="btn btn-outline-dark" style="margin-left:1em">Logout</button>
         </form>
       <% } else {%>
         <form class="form-inline" method ="POST" action ="/login">
