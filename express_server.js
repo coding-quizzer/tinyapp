@@ -100,8 +100,8 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  const username = req.body.username;
-  res.cookie("user_id", username);
+  const userID = req.body.userID;
+  res.cookie("user_id", userID);
   res.redirect("/urls");
 });
 
