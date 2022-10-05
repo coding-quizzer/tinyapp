@@ -141,17 +141,26 @@ app.post("/logout", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
+
+  const userID = req.cookies.user_id;
+  const user = users[userID];
   
-  const userID = generateRandomString(6);
+  const newUserID = generateRandomString(6);
   const {email, password} = req.body;
   const isDuplicateEmail = !!findUserWithEmail(email);
+  let statusCode;
   
   if (!email || !password || isDuplicateEmail) {
-    res.status(400).send("Invalid Registration. Please go back and try again");
+    statusCode = 400;
+    res.status(statusCode).render("error_page", { 
+      user, 
+      statusCode,
+      message: "Invalid Registration info. Please return and try again"
+    });
     return;
   }
-  users[userID] = {userID, email, password};
-  res.cookie("user_id", userID);
+  users[newUserID] = {id: newUserID, email, password};
+  res.cookie("user_id", newUserID);
   console.log(users);
   res.redirect("/urls");
 });
