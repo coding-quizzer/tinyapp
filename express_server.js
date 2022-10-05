@@ -110,8 +110,12 @@ app.post("/logout", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
+  
   const userID = generateRandomString(6);
   const {email, password} = req.body;
+  if (!email || !password) {
+    res.sendStatus(404);
+  }
   users[userID] = {userID, email, password};
   res.cookie("user_id", userID);
   console.log(users);
