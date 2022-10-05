@@ -115,8 +115,23 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  const userID = req.body.userID;
+  const { email, password } = req.body;
+  const user = findUserWithEmail(email);
+  console.log(user);
+  if (!user) {
+    res.status(403).send("Invalid Account Info. Please Try again");
+    return;
+  };
+  
+  const { id: userID, password: userPassword } = user;
+  
+  if (password !== userPassword) {
+    res.status(403).send("Invalid Account Info. Please Try again");
+    return;
+  }
+
   res.cookie("user_id", userID);
+  
   res.redirect("/urls");
 });
 
