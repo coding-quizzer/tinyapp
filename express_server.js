@@ -24,6 +24,16 @@ const urlDatabase = {
   "9sm5xK": "http://google.com"
 };
 
+const findUserWithEmail = function(email) {
+  for (let userKey in users) {
+    const user = users[userKey];
+    if (user.email === email) {
+      return user;
+    }
+  }
+  return null;
+}
+
 const generateRandomString = function(len) {
   // generates a random number between 0 and (36 ^ len) and converts it to a string, rendering it base 36
   return Math.floor(Math.random() * Math.pow(36, len)).toString(36);
@@ -113,8 +123,11 @@ app.post("/register", (req, res) => {
   
   const userID = generateRandomString(6);
   const {email, password} = req.body;
-  if (!email || !password) {
-    res.sendStatus(404);
+  const isDuplicateEmail = !!findUserWithEmail(email);
+  
+  if (!email || !password || isDuplicateEmail) {
+    res.status(400).send("Invalid Registration. Please go back and try again");
+    return;
   }
   users[userID] = {userID, email, password};
   res.cookie("user_id", userID);
