@@ -101,7 +101,6 @@ app.post("/logout", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  console.log(req.body);
   const {userID, submits: {email, password}} = {userID: generateRandomString(6), submits: req.body};
   users[userID] = {userID, email, password};
   res.cookie("user_id", userID);
