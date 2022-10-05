@@ -46,8 +46,8 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show.ejs", templateVars);
 });
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
+app.get("/register", (req, res) => {
+  res.render("registration_index.ejs", {username: req.cookies.username});
 });
 
 app.get("/u/:id", (req, res) => {
