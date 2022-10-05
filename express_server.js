@@ -88,6 +88,12 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);
 });
 
+app.get("/login", (req, res) => {
+  const userID = req.cookies.user_id;
+  const user = users[userID];
+  res.render("login", { user });
+})
+
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(6);
   const longURL = req.body.longURL;
