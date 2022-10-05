@@ -12,13 +12,32 @@
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
       />
-    <title>TinyApps</title>
+    <title>Registration Page</title>
   </head>
   <body>
     <%- include('partials/_header') %>
     <main style="margin: 1em;">
-      <h3>My URLs</h3>
+      <h3>Register Account</h3>
       
+      <form action="/register" method="POST">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            name="email"
+            placeholder="name@example.com"
+          />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            name="password"
+            placeholder="Enter a Password"
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Register</button>
+      </form>
     </main>
     <!-- Bootstrap JS -->
     <script
