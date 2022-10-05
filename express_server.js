@@ -107,8 +107,6 @@ app.post("/register", (req, res) => {
   res.cookie("user_id", userID);
   console.log(users);
   res.redirect("/urls");
-
-
 })
 
 app.listen(PORT, () => {
