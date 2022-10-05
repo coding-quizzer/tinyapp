@@ -147,14 +147,8 @@ app.post("/register", (req, res) => {
   const isDuplicateEmail = !!findUserWithEmail(email);
   
   if (!email || !password || isDuplicateEmail) {
-    const userID = req.cookies.user_id;
-    const user = users[userID]; 
-    res.status(400);
-    res.render("registration-index", {user, error: "invalid email" });
-  }
-
-  if (!password) {
-
+    res.status(400).send("Invalid Registration. Please go back and try again");
+    return;
   }
   users[userID] = {userID, email, password};
   res.cookie("user_id", userID);
