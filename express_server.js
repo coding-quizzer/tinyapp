@@ -63,6 +63,10 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
+  // or res.user
+  if (!req.cookies.user_id) {
+    res.redirect("/login") ;
+  }
   const templateVars = { user: res.user};
   res.render("urls_new", templateVars);
 });
@@ -77,6 +81,7 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
+  // Change to res.user, if the object still makes sense after the refactoring
   if (req.cookies.user_id) {
     res.redirect("/urls");
   }
@@ -92,12 +97,21 @@ app.get("/u/:id", (req, res) => {
 app.get("/login", (req, res) => {
   // change back to res.user, if reasonable after refactor.
   if (req.cookies.user_id) {
-    res.redirect("/urls");
+    res.status(401).redirect("/urls");
   }
   res.render("login", { user: '' });
 })
 
 app.post("/urls", (req, res) => {
+  // or res.user
+  if (!req.cookies.user_id) {
+    res.status(401).render("error_page", {
+      user: '',
+      statusCode: 401,
+      message: "You must be logged in to create a new short URL. Please Log in and try again"
+    });
+    return;
+  }
   const shortURL = generateRandomString(6);
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
