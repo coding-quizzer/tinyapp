@@ -59,7 +59,6 @@ app.get("/urls", (req, res) => {
     user: res.user,
     urls: urlDatabase
   };
-  console.log("Users", users);
   res.render("urls_index", templateVars);
 });
 
