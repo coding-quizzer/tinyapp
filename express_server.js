@@ -178,9 +178,9 @@ app.post("/urls/:id", (req, res) => {
     res.sendError(401, "You must be logged in to edit a tinyURL", "/urls");
     return;
   }
+  const id = req.params.id;
   const availableUrls = urlsForUser(urlDatabase, userID);
   const availableKeys = availableUrls.map(url => url.id);
-  const id = req.params.id;
   if (!availableKeys.includes(id)) {
     res.sendError(401, "You can only edit your own tiny URLs", "/urls");
     return;
@@ -200,7 +200,7 @@ app.post("/urls/:id/delete", (req, res) => {
   const availableURLs = urlsForUser(urlDatabase, userID);
   const availableKeys = availableURLs.map(url => url.id);
   if (!availableKeys.includes(id)) {
-    res.sendError(401, "Users can only delete their own tiny URLs", "/urls");
+    res.sendError(401, "You can only delete your own tiny URLs", "/urls");
     return;
   }
   delete urlDatabase[id];
@@ -243,10 +243,16 @@ app.post("/register", (req, res) => {
   const password = bcrypt.hashSync(req.body.password, 10);
   const isDuplicateEmail = !!findUserWithEmail(users, email);
   
-  if (!email || !password || isDuplicateEmail) {
-    res.sendError(400, "Invalid Registration info. Please return and try again", "/register");
+  if (!email || !password) {
+    res.sendError(400, "Invalid Registration info. Please return and try again.", "/register");
     return;
   }
+
+  if (isDuplicateEmail) {
+    res.sendError(400, "Account already exists. For a new account please use a different email address.", "/register");
+    return;
+  }
+
   users[newUserID] = {id: newUserID, email, password};
   req.session.user_id = newUserID;
   res.redirect("/urls");
