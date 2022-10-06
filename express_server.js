@@ -1,5 +1,6 @@
 const express = require("express");
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080; //default port 8080
 
@@ -10,12 +11,12 @@ const users = {
   userRandomID: {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey=dinosaur"
+    password: bcrypt.hashSync("purple-monkey=dinosaur")
   },
   user2RandomID: {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk",
+    password: bcrypt.hashSync("dishwasher-funk"),
   },
 };
 
@@ -80,6 +81,7 @@ app.use((req, res, next) => {
 })
 
 app.get("/", (req, res) => {
+  console.log(users);
   res.send("Hello!");
 });
 
@@ -244,7 +246,8 @@ app.post("/logout", (req, res) => {
 
 app.post("/register", (req, res) => {
   const newUserID = generateRandomString(6);
-  const {email, password} = req.body;
+  const email = req.body;
+  const password = bcrypt.hashSync(req.body.password, 10);
   const isDuplicateEmail = !!findUserWithEmail(email);
   
   if (!email || !password || isDuplicateEmail) {
