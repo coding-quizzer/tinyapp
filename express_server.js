@@ -104,6 +104,13 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
+  const userID = req.cookies.user_id;
+  if (!userID) {
+    const statusCode = 401;
+    const errorMessage = "Only registered users can access the page for a tiny URL";
+    const errorMessageEncoded = encodeURI(errorMessage);
+    res.redirect(`/urls/error/${statusCode}/${errorMessageEncoded}`);
+  }
   const templateVars = {
     user: res.user,
     id: req.params.id,
