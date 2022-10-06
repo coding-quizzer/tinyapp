@@ -184,8 +184,25 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:id", (req, res) => {
-  const editLongURL = req.body.editLongURL;
+  const userID = req.cookies.user_id;
+  if (!userID) {
+    const statusCode = 401;
+    const errorMessage = "You must be logged in to edit a tinyURL";
+    const errorMessageEncoded = encodeURI(errorMessage);
+    res.redirect(`/urls/error/${statusCode}/${errorMessageEncoded}`);
+    return;
+  }
+  const availableUrls = urlsForUser(userID);
+  const availableKeys = availableUrls.map(url => url.id);
   const id = req.params.id;
+  if (!availableKeys.includes(id)) {
+    const statusCode = 401;
+    const errorMessage = "You can only edit your own tiny URLs";
+    const errorMessageEncoded = encodeURI(errorMessage);
+    res.redirect(`/urls/error/${statusCode}/${errorMessageEncoded}`);
+    return;
+  }
+  const editLongURL = req.body.editLongURL;
   urlDatabase[id].longURL = editLongURL;
   res.redirect(`/urls/${id}`);
 });
