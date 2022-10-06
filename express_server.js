@@ -1,14 +1,17 @@
 const express = require("express");
 const cookieSession = require('cookie-session');
 const { findUserWithEmail } = require('./helpers');
-
 const bcrypt = require('bcryptjs');
+
 const app = express();
 const PORT = 8080; //default port 8080
 
 
-
 app.set("view engine", "ejs");
+
+/**
+ * Set up databases
+ */
 
 const users = {
   userRandomID: {
@@ -35,6 +38,10 @@ const urlDatabase = {
   }
 };
 
+/**
+ * Helper functions
+ */
+
 
 const urlsForUser = function(urlDatabase, id) {
   let urlKeys = Object.keys(urlDatabase);
@@ -54,11 +61,15 @@ const generateRandomString = function(len) {
   return Math.floor(Math.random() * Math.pow(36, len)).toString(36);
 };
 
-generateRandomString();
+/**
+ * Middleware
+ */
+
 app.use(cookieSession({
   name: 'session',
   keys: ["key1", "key2"]
 }));
+
 
 app.use(express.urlencoded({extended: true}));
 
@@ -75,6 +86,16 @@ app.use((req, res, next) => {
   };
   next();
 });
+
+/**
+ * 
+ * Routing: 
+ * 
+ */
+
+/**
+ *  GET requests
+ */
 
 app.get("/", (req, res) => {
   res.redirect("/login");
@@ -160,12 +181,16 @@ app.get("/:main/error/:status/:message", (req, res) => {
   res.status(intStatus).render("error_page", { user, statusCode: intStatus, message: decodedMessage});
 });
 
+/**
+ *  POST requests
+ */
+
 app.post("/urls", (req, res) => {
-  if (!res.user) {
+  const userID = req.session.user_id;
+  if (!userID) {
     res.sendError(401, "You must be logged in to create a new short URL. Please Log in and try again", "/urls");
     return;
   }
-  const userID = req.session.user_id;
   const shortURL = generateRandomString(6);
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = { longURL, userID };
@@ -257,6 +282,10 @@ app.post("/register", (req, res) => {
   req.session.user_id = newUserID;
   res.redirect("/urls");
 });
+
+/**
+ *  Server Listener
+ */
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
