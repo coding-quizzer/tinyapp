@@ -1,5 +1,6 @@
 const express = require("express");
 const cookieSession = require('cookie-session');
+const { findUserWithEmail } = require('./helpers');
 
 const bcrypt = require('bcryptjs');
 const app = express();
@@ -34,15 +35,6 @@ const urlDatabase = {
   }
 };
 
-const findUserWithEmail = function(userDatabase, email) {
-  for (let userKey in userDatabase) {
-    const user = users[userKey];
-    if (user.email === email) {
-      return user;
-    }
-  }
-  return null;
-}
 
 const urlsForUser = function(urlDatabase, id) {
   let urlKeys = Object.keys(urlDatabase);
