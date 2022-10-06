@@ -208,7 +208,24 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/urls/:id/delete", (req, res) => {
+  const userID = req.cookies.user_id;
+  if (!userID) {
+    const statusCode = 401;
+    const errorMessage = "You must be logged in to delete a tiny URL";
+    const errorMessageEncoded = encodeURI(errorMessage);
+    res.redirect(`/urls/error/${statusCode}/${errorMessageEncoded}`);
+    return;
+  }
   const id = req.params.id;
+  const availableURLs = urlsForUser(userID);
+  const availableKeys = availableURLs.map(url => url.id);
+  if (!availableKeys.includes(id)) {
+    const statusCode = 401;
+    const errorMessage = "Users can only delete their own tiny URLs";
+    const errorMessageEncoded = encodeURI(errorMessage);
+    res.redirect(`/urls/error/${statusCode}/${errorMessageEncoded}`);
+    return;
+  }
   delete urlDatabase[id];
   res.redirect("/urls");
 });
