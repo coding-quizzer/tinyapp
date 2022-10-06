@@ -45,7 +45,6 @@ const urlsForUser = function(urlDatabase, id) {
     url.id = validKey;
     return url;
   });
-  console.log(validURLs);
 
   return validURLs;
 };
@@ -66,7 +65,6 @@ app.use(express.urlencoded({extended: true}));
 app.use((req, res, next) => {
   const userID = req.session.user_id;
   res.user = users[userID];
-  console.log(res.user);
   next();
 });
 
@@ -217,7 +215,6 @@ app.post("/login", (req, res) => {
 
   const { email, password } = req.body;
   const loggedUser = findUserWithEmail(users, email);
-  console.log(loggedUser);
   if (!loggedUser) {
     renderError();
     return;
@@ -252,7 +249,6 @@ app.post("/register", (req, res) => {
   }
   users[newUserID] = {id: newUserID, email, password};
   req.session.user_id = newUserID;
-  console.log(users);
   res.redirect("/urls");
 });
 
