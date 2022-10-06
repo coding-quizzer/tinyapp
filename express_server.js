@@ -78,6 +78,9 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
+  if (req.cookies.user_id) {
+    res.redirect("/urls");
+  }
   res.render("registration_index.ejs", { user: res.user });
 });
 
@@ -88,6 +91,10 @@ app.get("/u/:id", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
+  // change back to res.user, if reasonable after refactor.
+  if (req.cookies.user_id) {
+    res.redirect("/urls");
+  }
   res.render("login", { user: res.user });
 })
 
