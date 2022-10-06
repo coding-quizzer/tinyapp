@@ -80,7 +80,7 @@ app.get("/register", (req, res) => {
   if (req.cookies.user_id) {
     res.redirect("/urls");
   }
-  res.render("registration_index.ejs", { user: res.user });
+  res.render("registration_index.ejs", { user: '' });
 });
 
 app.get("/u/:id", (req, res) => {
@@ -94,7 +94,7 @@ app.get("/login", (req, res) => {
   if (req.cookies.user_id) {
     res.redirect("/urls");
   }
-  res.render("login", { user: res.user });
+  res.render("login", { user: '' });
 })
 
 app.post("/urls", (req, res) => {
