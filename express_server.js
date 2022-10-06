@@ -120,12 +120,12 @@ app.get("/login", (req, res) => {
   res.render("login", { user: '' });
 });
 
-app.get("/:main/error/:status/:message") {
+app.get("/:main/error/:status/:message", (req, res) => {
   const { status, message } = req.params;
   const decodedMessage = decodeURI(message);
   const user = res.user;
   res.status(status).render("error_page", { user, status, message: decodedMessage});
-}
+});
 
 app.post("/urls", (req, res) => {
   if (!res.user) {
