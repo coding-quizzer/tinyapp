@@ -1,6 +1,6 @@
 const express = require("express");
 const cookieSession = require('cookie-session');
-const cookieParser = require('cookie-parser');
+
 const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080; //default port 8080
@@ -69,7 +69,6 @@ app.use(cookieSession({
   keys: ["key1", "key2"]
 }));
 
-app.use(cookieParser());
 app.use(express.urlencoded({extended: true}));
 
 app.use((req, res, next) => {
