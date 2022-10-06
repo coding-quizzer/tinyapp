@@ -48,15 +48,13 @@ app.use((req, res, next) => {
   res.user = users[userID];
   console.log(res.user);
   next();
-})
+});
 
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
 app.get("/urls", (req, res) => {
-  /* const userID = req.cookies.user_id;
-  const user = users[userID]; */
   const templateVars = {
     user: res.user,
     urls: urlDatabase
@@ -66,17 +64,13 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const userID = req.cookies.user_id;
-  const user = users[userID];
-  const templateVars = { user };
+  const templateVars = { user: res.user};
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
-  const userID = req.cookies.user_id;
-  const user = users[userID];
   const templateVars = {
-    user,
+    user: res.user,
     id: req.params.id,
     longURL: urlDatabase[req.params.id]
   };
@@ -84,9 +78,7 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const userID = req.cookies.user_id;
-  const user = users[userID]; 
-  res.render("registration_index.ejs", { user });
+  res.render("registration_index.ejs", { user: res.user });
 });
 
 app.get("/u/:id", (req, res) => {
@@ -96,9 +88,7 @@ app.get("/u/:id", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  const userID = req.cookies.user_id;
-  const user = users[userID];
-  res.render("login", { user });
+  res.render("login", { user: res.user });
 })
 
 app.post("/urls", (req, res) => {
@@ -122,13 +112,10 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  const userID = req.cookies.user_id;
-  const user = users[userID];
-  
   const renderError = () => {
     const statusCode = 403;
     res.status(statusCode).render("error_page", {
-      user,
+      user: res.user,
       statusCode,
       message: "Invalid Account Info. Please Try again"
     });
@@ -160,10 +147,6 @@ app.post("/logout", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-
-  const userID = req.cookies.user_id;
-  const user = users[userID];
-  
   const newUserID = generateRandomString(6);
   const {email, password} = req.body;
   const isDuplicateEmail = !!findUserWithEmail(email);
@@ -172,7 +155,7 @@ app.post("/register", (req, res) => {
   if (!email || !password || isDuplicateEmail) {
     statusCode = 400;
     res.status(statusCode).render("error_page", { 
-      user, 
+      user: res.user, 
       statusCode,
       message: "Invalid Registration info. Please return and try again"
     });
