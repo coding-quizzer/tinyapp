@@ -115,22 +115,34 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
+  const userID = req.cookies.user_id;
+  const user = users[userID];
+  
+  const renderError = () => {
+    const statusCode = 403;
+    res.status(statusCode).render("error_page", {
+      user,
+      statusCode,
+      message: "Invalid Account Info. Please Try again"
+    });
+  }
+
   const { email, password } = req.body;
-  const user = findUserWithEmail(email);
-  console.log(user);
-  if (!user) {
-    res.status(403).send("Invalid Account Info. Please Try again");
+  const loggedUser = findUserWithEmail(email);
+  console.log(loggedUser);
+  if (!loggedUser) {
+    renderError();
     return;
   };
   
-  const { id: userID, password: userPassword } = user;
+  const { id: loggedUserID, password: userPassword } = loggedUser;
   
   if (password !== userPassword) {
-    res.status(403).send("Invalid Account Info. Please Try again");
-    return;
+    const statusCode = 403;
+    renderError();
   }
 
-  res.cookie("user_id", userID);
+  res.cookie("user_id", loggedUserID);
   
   res.redirect("/urls");
 });
