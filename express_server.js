@@ -48,7 +48,7 @@ const urlsForUser = function(urlDatabase, id) {
   console.log(validURLs);
 
   return validURLs;
-} 
+};
 
 const generateRandomString = function(len) {
   // generates a random number between 0 and (36 ^ len) and converts it to a string, rendering it base 36
@@ -74,9 +74,9 @@ app.use((req, res, next) => {
   res.sendError = (statusCode, message, path) => {
     const errorMessageEncoded = encodeURI(message);
     res.redirect(`${path}/error/${statusCode}/${errorMessageEncoded}`);
-  }
+  };
   next();
-})
+});
 
 app.get("/", (req, res) => {
   res.redirect("/login");
@@ -100,7 +100,7 @@ app.get("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   if (!req.session.user_id) {
-    res.redirect("/login") ;
+    res.redirect("/login");
   }
   const templateVars = { user: res.user};
   res.render("urls_new", templateVars);
@@ -202,7 +202,7 @@ app.post("/urls/:id/delete", (req, res) => {
   const availableURLs = urlsForUser(urlDatabase, userID);
   const availableKeys = availableURLs.map(url => url.id);
   if (!availableKeys.includes(id)) {
-    res.sendError(401, "Users can only delete their own tiny URLs", "/urls")
+    res.sendError(401, "Users can only delete their own tiny URLs", "/urls");
     return;
   }
   delete urlDatabase[id];
@@ -211,9 +211,9 @@ app.post("/urls/:id/delete", (req, res) => {
 
 app.post("/login", (req, res) => {
   const renderError = () => {
-    res.sendError (403, "Invalid Account Info. Please Try again", "/login");
+    res.sendError(403, "Invalid Account Info. Please Try again", "/login");
     return;
-  }
+  };
 
   const { email, password } = req.body;
   const loggedUser = findUserWithEmail(users, email);
@@ -221,7 +221,7 @@ app.post("/login", (req, res) => {
   if (!loggedUser) {
     renderError();
     return;
-  };
+  }
   
   const { id: loggedUserID, password: hashedPassword } = loggedUser;
   
