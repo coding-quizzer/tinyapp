@@ -98,7 +98,7 @@ app.get("/urls", (req, res) => {
     return;
   }
 
-  const availableURLs = urlsForUser(userID);
+  const availableURLs = urlsForUser(urlDatabase, userID);
   const templateVars = {
     user: res.user,
     urls: availableURLs,
@@ -121,7 +121,7 @@ app.get("/urls/:id", (req, res) => {
     return;
   }
   const id = req.params.id;
-  const availableURLs = urlsForUser(userID);
+  const availableURLs = urlsForUser(urlDatabase, userID);
   const availableKeys = availableURLs.map(url => url.id);
   if (!availableKeys.includes(id)) {
     res.sendError(401, `Tiny URL ${id} is not available for you. If you want to edit or view a short URL for a website, you will have to make it yourself.`, "/urls");
@@ -188,7 +188,7 @@ app.post("/urls/:id", (req, res) => {
     res.sendError(401, "You must be logged in to edit a tinyURL", "/urls");
     return;
   }
-  const availableUrls = urlsForUser(userID);
+  const availableUrls = urlsForUser(urlDatabase, userID);
   const availableKeys = availableUrls.map(url => url.id);
   const id = req.params.id;
   if (!availableKeys.includes(id)) {
@@ -207,7 +207,7 @@ app.post("/urls/:id/delete", (req, res) => {
     return;
   }
   const id = req.params.id;
-  const availableURLs = urlsForUser(userID);
+  const availableURLs = urlsForUser(urlDatabase, userID);
   const availableKeys = availableURLs.map(url => url.id);
   if (!availableKeys.includes(id)) {
     res.sendError(401, "Users can only delete their own tiny URLs", "/urls")
@@ -224,7 +224,7 @@ app.post("/login", (req, res) => {
   }
 
   const { email, password } = req.body;
-  const loggedUser = findUserWithEmail(email);
+  const loggedUser = findUserWithEmail(emailDatabase, email);
   console.log(loggedUser);
   if (!loggedUser) {
     renderError();
@@ -252,7 +252,7 @@ app.post("/register", (req, res) => {
   const newUserID = generateRandomString(6);
   const email = req.body.email;
   const password = bcrypt.hashSync(req.body.password, 10);
-  const isDuplicateEmail = !!findUserWithEmail(email);
+  const isDuplicateEmail = !!findUserWithEmail(emailDatabase, email);
   
   if (!email || !password || isDuplicateEmail) {
     res.sendError(400, "Invalid Registration info. Please return and try again", "/register");
