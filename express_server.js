@@ -167,8 +167,8 @@ app.post("/login", (req, res) => {
   const { id: loggedUserID, password: userPassword } = loggedUser;
   
   if (password !== userPassword) {
-    const statusCode = 403;
     renderError();
+    return;
   }
 
   res.cookie("user_id", loggedUserID);
