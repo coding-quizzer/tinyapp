@@ -216,7 +216,7 @@ app.post("/login", (req, res) => {
   }
 
   const { email, password } = req.body;
-  const loggedUser = findUserWithEmail(emailDatabase, email);
+  const loggedUser = findUserWithEmail(users, email);
   console.log(loggedUser);
   if (!loggedUser) {
     renderError();
@@ -244,7 +244,7 @@ app.post("/register", (req, res) => {
   const newUserID = generateRandomString(6);
   const email = req.body.email;
   const password = bcrypt.hashSync(req.body.password, 10);
-  const isDuplicateEmail = !!findUserWithEmail(emailDatabase, email);
+  const isDuplicateEmail = !!findUserWithEmail(users, email);
   
   if (!email || !password || isDuplicateEmail) {
     res.sendError(400, "Invalid Registration info. Please return and try again", "/register");
