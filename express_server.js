@@ -71,6 +71,13 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  res.sendError = (statusCode, message, path) => {
+    const errorMessageEncoded = encodeURI(message);
+    this.redirect(`${path}/error/${statusCode}/${message}`);
+  }
+})
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
