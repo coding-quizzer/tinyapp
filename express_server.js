@@ -74,8 +74,9 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   res.sendError = (statusCode, message, path) => {
     const errorMessageEncoded = encodeURI(message);
-    this.redirect(`${path}/error/${statusCode}/${message}`);
+    res.redirect(`${path}/error/${statusCode}/${errorMessageEncoded}`);
   }
+  next();
 })
 
 app.get("/", (req, res) => {
@@ -86,10 +87,7 @@ app.get("/urls", (req, res) => {
   const userID = req.cookies.user_id;
 
   if (!userID) {
-    const statusCode = 401;
-    const errorMessage = "Please log in to acess tinyURLs";
-    const errorMessageEncoded = encodeURI(errorMessage);
-    res.redirect(`/urls/error/${statusCode}/${errorMessageEncoded}`);
+    res.sendError(401, "Please log in to access tinyURLs.", "/urls");
     return;
   }
 
@@ -113,20 +111,14 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const userID = req.cookies.user_id;
   if (!userID) {
-    const statusCode = 401;
-    const errorMessage = "Only registered users can access the page for a tiny URL";
-    const errorMessageEncoded = encodeURI(errorMessage);
-    res.redirect(`/urls/error/${statusCode}/${errorMessageEncoded}`);
+    res.sendError(401, "Only registered users can access the page for a tiny URL", "/urls");
     return;
   }
   const id = req.params.id;
   const availableURLs = urlsForUser(userID);
   const availableKeys = availableURLs.map(url => url.id);
   if (!availableKeys.includes(id)) {
-    const statusCode = 401;
-    const errorMessage = `Tiny URL ${id} is not available for you. If you want to edit or view a short URL for a website, you will have to make it yourself.`;
-    const errorMessageEncoded = encodeURI(errorMessage);
-    res.redirect(`/urls/error/${statusCode}/${errorMessageEncoded}`);
+    res.sendError(401, `Tiny URL ${id} is not available for you. If you want to edit or view a short URL for a website, you will have to make it yourself.`, "/urls");
   }
   
   const templateVars = {
@@ -150,10 +142,7 @@ app.get("/u/:id", (req, res) => {
   
 
   if (!urlDatabase[id]) {
-    const statusCode = 404;
-    const errorMessage = "This short URL doesn't exist. Please use a valid short URL"
-    const errorMessageEncoded = encodeURI(errorMessage);
-    res.redirect(`/u/error/${statusCode}/${errorMessageEncoded}`);
+    res.sendError(404, "This short URL doesn't exist. Please use a valid short URL", "/u");
     return;
   }
   const longURL = urlDatabase[id].longURL;
@@ -161,7 +150,6 @@ app.get("/u/:id", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  // change back to res.user, if reasonable after refactor.
   if (req.cookies.user_id) {
     res.status(401).redirect("/urls");
   }
@@ -178,10 +166,7 @@ app.get("/:main/error/:status/:message", (req, res) => {
 
 app.post("/urls", (req, res) => {
   if (!res.user) {
-    const statusCode = 401;
-    const errorMessage = "You must be logged in to create a new short URL. Please Log in and try again";
-    const errorMessageEncoded = encodeURI(errorMessage);
-    res.redirect(`/urls/error/${statusCode}/${errorMessageEncoded}`);
+    res.sendError(401, "You must be logged in to create a new short URL. Please Log in and try again", "/urls");
     return;
   }
   const userID = req.cookies.user_id;
@@ -194,20 +179,14 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const userID = req.cookies.user_id;
   if (!userID) {
-    const statusCode = 401;
-    const errorMessage = "You must be logged in to edit a tinyURL";
-    const errorMessageEncoded = encodeURI(errorMessage);
-    res.redirect(`/urls/error/${statusCode}/${errorMessageEncoded}`);
+    res.sendError(401, "You must be logged in to edit a tinyURL", "/urls");
     return;
   }
   const availableUrls = urlsForUser(userID);
   const availableKeys = availableUrls.map(url => url.id);
   const id = req.params.id;
   if (!availableKeys.includes(id)) {
-    const statusCode = 401;
-    const errorMessage = "You can only edit your own tiny URLs";
-    const errorMessageEncoded = encodeURI(errorMessage);
-    res.redirect(`/urls/error/${statusCode}/${errorMessageEncoded}`);
+    res.sendError(401, "You can only edit your own tiny URLs", "/urls");
     return;
   }
   const editLongURL = req.body.editLongURL;
@@ -218,20 +197,14 @@ app.post("/urls/:id", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   const userID = req.cookies.user_id;
   if (!userID) {
-    const statusCode = 401;
-    const errorMessage = "You must be logged in to delete a tiny URL";
-    const errorMessageEncoded = encodeURI(errorMessage);
-    res.redirect(`/urls/error/${statusCode}/${errorMessageEncoded}`);
+    res.sendError(401, "You must be logged in to delete a tiny URL", "/urls");
     return;
   }
   const id = req.params.id;
   const availableURLs = urlsForUser(userID);
   const availableKeys = availableURLs.map(url => url.id);
   if (!availableKeys.includes(id)) {
-    const statusCode = 401;
-    const errorMessage = "Users can only delete their own tiny URLs";
-    const errorMessageEncoded = encodeURI(errorMessage);
-    res.redirect(`/urls/error/${statusCode}/${errorMessageEncoded}`);
+    res.sendError(401, "Users can only delete their own tiny URLs", "/urls")
     return;
   }
   delete urlDatabase[id];
@@ -240,10 +213,8 @@ app.post("/urls/:id/delete", (req, res) => {
 
 app.post("/login", (req, res) => {
   const renderError = () => {
-    const statusCode = 403;
-    const errorMessage = "Invalid Account Info. Please Try again"
-    const errorMessageEncoded = encodeURI(errorMessage);
-    res.redirect(`/login/error/${statusCode}/${errorMessageEncoded}`);
+    res.sendError (403, "Invalid Account Info. Please Try again", "/login");
+    return;
   }
 
   const { email, password } = req.body;
@@ -275,14 +246,9 @@ app.post("/register", (req, res) => {
   const newUserID = generateRandomString(6);
   const {email, password} = req.body;
   const isDuplicateEmail = !!findUserWithEmail(email);
-  let statusCode;
   
   if (!email || !password || isDuplicateEmail) {
-    const statusCode = 400;
-    const errorMessage = "Invalid Registration info. Please return and try again";
-    const errorMessageEncoded = encodeURI(errorMessage);
-    res.redirect(`/register/error/${statusCode}/${errorMessageEncoded}`)
-    
+    res.sendError(400, "Invalid Registration info. Please return and try again", "/register");
     return;
   }
   users[newUserID] = {id: newUserID, email, password};
