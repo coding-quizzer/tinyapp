@@ -41,6 +41,20 @@ const findUserWithEmail = function(email) {
   return null;
 }
 
+const urlsForUser = function(id) {
+  let urlKeys = Object.keys(urlDatabase);
+  // filter the keys
+  const validKeys = urlKeys.filter(urlKey => urlDatabase[urlKey].userID === id);
+  const validURLs = validKeys.map(validKey => {
+    const url = urlDatabase[validKey];
+    url.id = validKey;
+    return url;
+  });
+  console.log(validURLs);
+
+  return validURLs;
+} 
+
 const generateRandomString = function(len) {
   // generates a random number between 0 and (36 ^ len) and converts it to a string, rendering it base 36
   return Math.floor(Math.random() * Math.pow(36, len)).toString(36);
@@ -62,12 +76,20 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  if (!req.cookies.user_id) {
+  const userID = req.cookies.user_id;
 
+  if (!userID) {
+    const statusCode = 401;
+    const errorMessage = "Please log in to acess tinyURLs";
+    const errorMessageEncoded = encodeURI(errorMessage);
+    res.redirect(`/urls/error/${statusCode}/${errorMessageEncoded}`);
+    return;
   }
+
+  const availableURLs = urlsForUser(userID);
   const templateVars = {
     user: res.user,
-    urls: urlDatabase
+    urls: availableURLs,
   };
   res.render("urls_index", templateVars);
 });
