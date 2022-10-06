@@ -100,15 +100,16 @@ app.get("/register", (req, res) => {
 
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
-  const longURL = urlDatabase[id].longURL;
-  if (!longURL) {
-    res.status(404).render("error_page", {
-      user: res.user,
-      statusCode: 404,
-      message: "This short URL doesn't exist. Please use a valid short URL"
-    });
+  
+
+  if (!urlDatabase[id]) {
+    const statusCode = 404;
+    const errorMessage = "This short URL doesn't exist. Please use a valid short URL"
+    const errorMessageEncoded = encodeURI(errorMessage);
+    res.redirect(`/u/error/${statusCode}/${errorMessageEncoded}`);
     return;
   }
+  const longURL = urlDatabase[id].longURL;
   res.redirect(longURL);
 });
 
@@ -124,16 +125,15 @@ app.get("/:main/error/:status/:message", (req, res) => {
   const { status, message } = req.params;
   const decodedMessage = decodeURI(message);
   const user = res.user;
-  res.status(status).render("error_page", { user, status, message: decodedMessage});
+  res.status(status).render("error_page", { user, statusCode: status, message: decodedMessage});
 });
 
 app.post("/urls", (req, res) => {
   if (!res.user) {
-    res.status(401).render("error_page", {
-      user: '',
-      statusCode: 401,
-      message: "You must be logged in to create a new short URL. Please Log in and try again"
-    });
+    const statusCode = 401;
+    const errorMessage = "You must be logged in to create a new short URL. Please Log in and try again";
+    const errorMessageEncoded = encodeURI(errorMessage);
+    res.redirect(`/urls/error/${statusCode}/${errorMessageEncoded}`);
     return;
   }
   const userID = req.cookies.user_id;
@@ -159,11 +159,9 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/login", (req, res) => {
   const renderError = () => {
     const statusCode = 403;
-    res.status(statusCode).render("error_page", {
-      user: res.user,
-      statusCode,
-      message: "Invalid Account Info. Please Try again"
-    });
+    const errorMessage = "Invalid Account Info. Please Try again"
+    const errorMessageEncoded = encodeURI(errorMessage);
+    res.redirect(`/login/error/${statusCode}/${errorMessageEncoded}`);
   }
 
   const { email, password } = req.body;
@@ -198,12 +196,11 @@ app.post("/register", (req, res) => {
   let statusCode;
   
   if (!email || !password || isDuplicateEmail) {
-    statusCode = 400;
-    res.status(statusCode).render("error_page", { 
-      user: res.user, 
-      statusCode,
-      message: "Invalid Registration info. Please return and try again"
-    });
+    const statusCode = 400;
+    const errorMessage = "Invalid Registration info. Please return and try again";
+    const errorMessageEncoded = encodeURI(errorMessage);
+    res.redirect(`/register/error/${statusCode}/${errorMessageEncoded}`)
+    
     return;
   }
   users[newUserID] = {id: newUserID, email, password};
