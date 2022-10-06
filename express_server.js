@@ -81,8 +81,7 @@ app.use((req, res, next) => {
 })
 
 app.get("/", (req, res) => {
-  console.log(users);
-  res.send("Hello!");
+  res.redirect("/login");
 });
 
 app.get("/urls", (req, res) => {
