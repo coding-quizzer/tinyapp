@@ -91,6 +91,14 @@ app.get("/register", (req, res) => {
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
   const longURL = urlDatabase[id];
+  if (!longURL) {
+    res.status(404).render("error_page", {
+      user: res.user,
+      statusCode: 404,
+      message: "This short URL doesn't exist. Please use a valid short URL"
+    });
+    return;
+  }
   res.redirect(longURL);
 });
 
