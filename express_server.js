@@ -43,15 +43,22 @@ generateRandomString();
 app.use(cookieParser());
 app.use(express.urlencoded({extended: true}));
 
+app.use((req, res, next) => {
+  const userID = req.cookies.user_id;
+  res.user = users[userID];
+  console.log(res.user);
+  next();
+})
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
 app.get("/urls", (req, res) => {
-  const userID = req.cookies.user_id;
-  const user = users[userID];
+  /* const userID = req.cookies.user_id;
+  const user = users[userID]; */
   const templateVars = {
-    user,
+    user: res.user,
     urls: urlDatabase
   };
   console.log("Users", users);
