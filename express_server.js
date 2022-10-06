@@ -73,12 +73,14 @@ app.use(cookieSession({
 
 app.use(express.urlencoded({extended: true}));
 
+// Add the current user object to res.user
 app.use((req, res, next) => {
   const userID = req.session.user_id;
   res.user = users[userID];
   next();
 });
 
+// Assign function that routes errors to the error path to res.sendError
 app.use((req, res, next) => {
   res.sendError = (statusCode, message, path) => {
     const errorMessageEncoded = encodeURI(message);
@@ -147,7 +149,6 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  // Change to res.user, if the object still makes sense after the refactoring
   if (req.session.user_id) {
     res.redirect("/urls");
   }
