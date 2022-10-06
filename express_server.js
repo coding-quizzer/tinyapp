@@ -163,9 +163,10 @@ app.get("/login", (req, res) => {
 
 app.get("/:main/error/:status/:message", (req, res) => {
   const { status, message } = req.params;
+  const intStatus = parseInt(status);
   const decodedMessage = decodeURI(message);
   const user = res.user;
-  res.status(status).render("error_page", { user, statusCode: status, message: decodedMessage});
+  res.status(intStatus).render("error_page", { user, statusCode: intStatus, message: decodedMessage});
 });
 
 app.post("/urls", (req, res) => {
