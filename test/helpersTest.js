@@ -21,5 +21,10 @@ describe('getUserByEmail', function() {
 
     const expectedUserID = "userRandomID";
     assert.strictEqual(user.id, expectedUserID);
-  })
-})
+  });
+
+  it('should return null if user doesn\'t exist in the database', function() {
+    const user = findUserWithEmail(testUsers, "readyfox@ready.com");
+    assert.isNull(user);
+  });
+});
