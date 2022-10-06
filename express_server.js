@@ -1,8 +1,10 @@
 const express = require("express");
+const cookieSession = require('cookie-session');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080; //default port 8080
+
 
 
 app.set("view engine", "ejs");
@@ -62,11 +64,16 @@ const generateRandomString = function(len) {
 };
 
 generateRandomString();
+app.use(cookieSession({
+  name: 'session',
+  keys: ["key1", "key2"]
+}));
+
 app.use(cookieParser());
 app.use(express.urlencoded({extended: true}));
 
 app.use((req, res, next) => {
-  const userID = req.cookies.user_id;
+  const userID = req.session.user_id;
   res.user = users[userID];
   console.log(res.user);
   next();
@@ -85,7 +92,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const userID = req.cookies.user_id;
+  const userID = req.session.user_id;
 
   if (!userID) {
     res.sendError(401, "Please log in to access tinyURLs.", "/urls");
@@ -101,8 +108,7 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  // or res.user
-  if (!req.cookies.user_id) {
+  if (!req.session.user_id) {
     res.redirect("/login") ;
   }
   const templateVars = { user: res.user};
@@ -110,7 +116,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  const userID = req.cookies.user_id;
+  const userID = req.session.user_id;
   if (!userID) {
     res.sendError(401, "Only registered users can access the page for a tiny URL", "/urls");
     return;
@@ -132,7 +138,7 @@ app.get("/urls/:id", (req, res) => {
 
 app.get("/register", (req, res) => {
   // Change to res.user, if the object still makes sense after the refactoring
-  if (req.cookies.user_id) {
+  if (req.session.user_id) {
     res.redirect("/urls");
   }
   res.render("registration_index.ejs", { user: '' });
@@ -151,7 +157,7 @@ app.get("/u/:id", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  if (req.cookies.user_id) {
+  if (req.session.user_id) {
     res.status(401).redirect("/urls");
   }
   res.render("login", { user: '' });
@@ -170,7 +176,7 @@ app.post("/urls", (req, res) => {
     res.sendError(401, "You must be logged in to create a new short URL. Please Log in and try again", "/urls");
     return;
   }
-  const userID = req.cookies.user_id;
+  const userID = req.session.user_id;
   const shortURL = generateRandomString(6);
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = { longURL, userID };
@@ -178,7 +184,7 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:id", (req, res) => {
-  const userID = req.cookies.user_id;
+  const userID = req.session.user_id;
   if (!userID) {
     res.sendError(401, "You must be logged in to edit a tinyURL", "/urls");
     return;
@@ -196,7 +202,7 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-  const userID = req.cookies.user_id;
+  const userID = req.session.user_id;
   if (!userID) {
     res.sendError(401, "You must be logged in to delete a tiny URL", "/urls");
     return;
@@ -233,19 +239,19 @@ app.post("/login", (req, res) => {
     return;
   }
 
-  res.cookie("user_id", loggedUserID);
+  req.session.user_id =  loggedUserID;
   
   res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect("/login");
 });
 
 app.post("/register", (req, res) => {
   const newUserID = generateRandomString(6);
-  const email = req.body;
+  const email = req.body.email;
   const password = bcrypt.hashSync(req.body.password, 10);
   const isDuplicateEmail = !!findUserWithEmail(email);
   
@@ -254,7 +260,7 @@ app.post("/register", (req, res) => {
     return;
   }
   users[newUserID] = {id: newUserID, email, password};
-  res.cookie("user_id", newUserID);
+  req.session.user_id = newUserID;
   console.log(users);
   res.redirect("/urls");
 });
