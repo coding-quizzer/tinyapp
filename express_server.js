@@ -62,6 +62,9 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
+  if (!req.cookies.user_id) {
+
+  }
   const templateVars = {
     user: res.user,
     urls: urlDatabase
@@ -115,7 +118,14 @@ app.get("/login", (req, res) => {
     res.status(401).redirect("/urls");
   }
   res.render("login", { user: '' });
-})
+});
+
+app.get("/:main/error/:status/:message") {
+  const { status, message } = req.params;
+  const decodedMessage = decodeURI(message);
+  const user = res.user;
+  res.status(status).render("error_page", { user, status, message: decodedMessage});
+}
 
 app.post("/urls", (req, res) => {
   if (!res.user) {
