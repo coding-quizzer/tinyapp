@@ -110,11 +110,22 @@ app.get("/urls/:id", (req, res) => {
     const errorMessage = "Only registered users can access the page for a tiny URL";
     const errorMessageEncoded = encodeURI(errorMessage);
     res.redirect(`/urls/error/${statusCode}/${errorMessageEncoded}`);
+    return;
   }
+  const id = req.params.id;
+  const availableURLs = urlsForUser(userID);
+  const availableKeys = availableURLs.map(url => url.id);
+  if (!availableKeys.includes(id)) {
+    const statusCode = 401;
+    const errorMessage = `Tiny URL ${id} is not available for you. If you want to edit or view a short URL for a website, you will have to make it yourself.`;
+    const errorMessageEncoded = encodeURI(errorMessage);
+    res.redirect(`/urls/error/${statusCode}/${errorMessageEncoded}`);
+  }
+  
   const templateVars = {
-    user: res.user,
-    id: req.params.id,
-    longURL: urlDatabase[req.params.id].longURL
+    id,
+    longURL: urlDatabase[id].longURL,
+    user: res.user
   };
   res.render("urls_show.ejs", templateVars);
 });
