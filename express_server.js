@@ -227,9 +227,9 @@ app.post("/login", (req, res) => {
     return;
   };
   
-  const { id: loggedUserID, password: userPassword } = loggedUser;
+  const { id: loggedUserID, password: hashedPassword } = loggedUser;
   
-  if (password !== userPassword) {
+  if (!bcrypt.compareSync(password, hashedPassword)) {
     renderError();
     return;
   }
