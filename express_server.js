@@ -34,8 +34,8 @@ const urlDatabase = {
   }
 };
 
-const findUserWithEmail = function(email) {
-  for (let userKey in users) {
+const findUserWithEmail = function(userDatabase, email) {
+  for (let userKey in userDatabase) {
     const user = users[userKey];
     if (user.email === email) {
       return user;
@@ -44,7 +44,7 @@ const findUserWithEmail = function(email) {
   return null;
 }
 
-const urlsForUser = function(id) {
+const urlsForUser = function(urlDatabase, id) {
   let urlKeys = Object.keys(urlDatabase);
   // filter the keys
   const validKeys = urlKeys.filter(urlKey => urlDatabase[urlKey].userID === id);
