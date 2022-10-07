@@ -1,14 +1,17 @@
 const express = require("express");
 const cookieSession = require('cookie-session');
 const { findUserWithEmail } = require('./helpers');
-
 const bcrypt = require('bcryptjs');
+
 const app = express();
 const PORT = 8080; //default port 8080
 
 
-
 app.set("view engine", "ejs");
+
+/**
+ * Set up databases
+ */
 
 const users = {
   userRandomID: {
@@ -35,6 +38,10 @@ const urlDatabase = {
   }
 };
 
+/**
+ * Helper functions
+ */
+
 
 const urlsForUser = function(urlDatabase, id) {
   let urlKeys = Object.keys(urlDatabase);
@@ -54,20 +61,26 @@ const generateRandomString = function(len) {
   return Math.floor(Math.random() * Math.pow(36, len)).toString(36);
 };
 
-generateRandomString();
+/**
+ * Middleware
+ */
+
 app.use(cookieSession({
   name: 'session',
   keys: ["key1", "key2"]
 }));
 
+
 app.use(express.urlencoded({extended: true}));
 
+// Add the current user object to res.user
 app.use((req, res, next) => {
   const userID = req.session.user_id;
   res.user = users[userID];
   next();
 });
 
+// Assign function that routes errors to the error path to res.sendError
 app.use((req, res, next) => {
   res.sendError = (statusCode, message, path) => {
     const errorMessageEncoded = encodeURI(message);
@@ -75,6 +88,16 @@ app.use((req, res, next) => {
   };
   next();
 });
+
+/**
+ * 
+ * Routing: 
+ * 
+ */
+
+/**
+ *  GET requests
+ */
 
 app.get("/", (req, res) => {
   res.redirect("/login");
@@ -126,7 +149,6 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  // Change to res.user, if the object still makes sense after the refactoring
   if (req.session.user_id) {
     res.redirect("/urls");
   }
@@ -160,12 +182,16 @@ app.get("/:main/error/:status/:message", (req, res) => {
   res.status(intStatus).render("error_page", { user, statusCode: intStatus, message: decodedMessage});
 });
 
+/**
+ *  POST requests
+ */
+
 app.post("/urls", (req, res) => {
-  if (!res.user) {
+  const userID = req.session.user_id;
+  if (!userID) {
     res.sendError(401, "You must be logged in to create a new short URL. Please Log in and try again", "/urls");
     return;
   }
-  const userID = req.session.user_id;
   const shortURL = generateRandomString(6);
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = { longURL, userID };
@@ -178,9 +204,9 @@ app.post("/urls/:id", (req, res) => {
     res.sendError(401, "You must be logged in to edit a tinyURL", "/urls");
     return;
   }
+  const id = req.params.id;
   const availableUrls = urlsForUser(urlDatabase, userID);
   const availableKeys = availableUrls.map(url => url.id);
-  const id = req.params.id;
   if (!availableKeys.includes(id)) {
     res.sendError(401, "You can only edit your own tiny URLs", "/urls");
     return;
@@ -200,7 +226,7 @@ app.post("/urls/:id/delete", (req, res) => {
   const availableURLs = urlsForUser(urlDatabase, userID);
   const availableKeys = availableURLs.map(url => url.id);
   if (!availableKeys.includes(id)) {
-    res.sendError(401, "Users can only delete their own tiny URLs", "/urls");
+    res.sendError(401, "You can only delete your own tiny URLs", "/urls");
     return;
   }
   delete urlDatabase[id];
@@ -243,14 +269,24 @@ app.post("/register", (req, res) => {
   const password = bcrypt.hashSync(req.body.password, 10);
   const isDuplicateEmail = !!findUserWithEmail(users, email);
   
-  if (!email || !password || isDuplicateEmail) {
-    res.sendError(400, "Invalid Registration info. Please return and try again", "/register");
+  if (!email || !password) {
+    res.sendError(400, "Invalid Registration info. Please return and try again.", "/register");
     return;
   }
+
+  if (isDuplicateEmail) {
+    res.sendError(400, "Account already exists. For a new account please use a different email address.", "/register");
+    return;
+  }
+
   users[newUserID] = {id: newUserID, email, password};
   req.session.user_id = newUserID;
   res.redirect("/urls");
 });
+
+/**
+ *  Server Listener
+ */
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
