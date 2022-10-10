@@ -30,7 +30,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Assign function that routes errors to the error path to res.sendToErrorPage
+// Assign function that routes errors to the error path as res.sendToErrorPage method
 app.use((req, res, next) => {
   res.sendToErrorPage = (statusCode, message, path) => {
     const errorMessageEncoded = encodeURI(message);
@@ -85,8 +85,7 @@ app.get("/urls/:id", (req, res) => {
     return;
   }
   const id = req.params.id;
-  const availableURLs = urlsForUser(urlDatabase, userID);
-  if (!availableURLs[id]) {
+  if (!urlDatabase[id] || urlDatabase[id].userID !== userID) {
     res.sendToErrorPage(401, `Tiny URL ${id} is not available for you. If you want to edit or view a short URL for a website, you will have to make it yourself.`, "/urls");
     return;
   }
@@ -158,8 +157,8 @@ app.post("/urls/:id", (req, res) => {
     return;
   }
   const id = req.params.id;
-  const availableURLs = urlsForUser(urlDatabase, userID);
-  if (!availableURLs[id]) {
+
+  if (!urlDatabase[id] || urlDatabase[id].userID !== userID) {
     res.sendToErrorPage(401, "You can only edit your own tiny URLs", "/urls");
     return;
   }
@@ -175,8 +174,7 @@ app.post("/urls/:id/delete", (req, res) => {
     return;
   }
   const id = req.params.id;
-  const availableURLs = urlsForUser(urlDatabase, userID);
-  if (!availableURLs[id]) {
+  if (!urlDatabase[id] || urlDatabase[id].userID !== userID) {
     res.sendToErrorPage(401, "You can only delete your own tiny URLs", "/urls");
     return;
   }
