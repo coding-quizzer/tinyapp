@@ -72,6 +72,7 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   if (!req.session.user_id) {
     res.redirect("/login");
+    return;
   }
   const templateVars = { user: res.user};
   res.render("urls_new", templateVars);
@@ -88,6 +89,7 @@ app.get("/urls/:id", (req, res) => {
   const availableKeys = availableURLs.map(url => url.id);
   if (!availableKeys.includes(id)) {
     res.sendError(401, `Tiny URL ${id} is not available for you. If you want to edit or view a short URL for a website, you will have to make it yourself.`, "/urls");
+    return;
   }
   
   const templateVars = {
@@ -101,6 +103,7 @@ app.get("/urls/:id", (req, res) => {
 app.get("/register", (req, res) => {
   if (req.session.user_id) {
     res.redirect("/urls");
+    return;
   }
   res.render("registration_index.ejs", { user: '' });
 });
@@ -120,6 +123,7 @@ app.get("/u/:id", (req, res) => {
 app.get("/login", (req, res) => {
   if (req.session.user_id) {
     res.status(401).redirect("/urls");
+    return;
   }
   res.render("login", { user: '' });
 });
