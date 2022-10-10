@@ -33,12 +33,12 @@
               <td><%= shortURL %></td>
               <td><%= urls[shortURL].longURL %></td>
               <td> 
-                <form method="GET" action="/urls/<%= urls[shortURL].id %>">
+                <form method="GET" action="/urls/<%= shortURL %>">
                   <button class="btn btn-outline-primary">Edit</button>
                 </form>
               </td>
               <td> 
-                <form method="POST" action="/urls/<%= urls[shortURL].id %>/delete">
+                <form method="POST" action="/urls/<%= shortURL %>/delete">
                   <button class="btn btn-outline-danger">Delete</button>
                 </form>
               </td>
