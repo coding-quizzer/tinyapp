@@ -30,9 +30,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// Assign function that routes errors to the error path to res.sendError
+// Assign function that routes errors to the error path to res.sendToErrorPage
 app.use((req, res, next) => {
-  res.sendError = (statusCode, message, path) => {
+  res.sendToErrorPage = (statusCode, message, path) => {
     const errorMessageEncoded = encodeURI(message);
     res.redirect(`${path}/error/${statusCode}/${errorMessageEncoded}`);
   };
@@ -57,7 +57,7 @@ app.get("/urls", (req, res) => {
   const userID = req.session.user_id;
 
   if (!userID) {
-    res.sendError(401, "Please log in to access tinyURLs.", "/urls");
+    res.sendToErrorPage(401, "Please log in to access tinyURLs.", "/urls");
     return;
   }
 
@@ -81,13 +81,13 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
   if (!userID) {
-    res.sendError(401, "Only registered users can access the page for a tiny URL", "/urls");
+    res.sendToErrorPage(401, "Only registered users can access the page for a tiny URL", "/urls");
     return;
   }
   const id = req.params.id;
   const availableURLs = urlsForUser(urlDatabase, userID);
   if (!availableURLs[id]) {
-    res.sendError(401, `Tiny URL ${id} is not available for you. If you want to edit or view a short URL for a website, you will have to make it yourself.`, "/urls");
+    res.sendToErrorPage(401, `Tiny URL ${id} is not available for you. If you want to edit or view a short URL for a website, you will have to make it yourself.`, "/urls");
     return;
   }
   
@@ -112,7 +112,7 @@ app.get("/u/:id", (req, res) => {
   
 
   if (!urlDatabase[id]) {
-    res.sendError(404, "This short URL doesn't exist. Please use a valid short URL", "/u");
+    res.sendToErrorPage(404, "This short URL doesn't exist. Please use a valid short URL", "/u");
     return;
   }
   const longURL = urlDatabase[id].longURL;
@@ -142,7 +142,7 @@ app.get("/:main/error/:status/:message", (req, res) => {
 app.post("/urls", (req, res) => {
   const userID = req.session.user_id;
   if (!userID) {
-    res.sendError(401, "You must be logged in to create a new short URL. Please Log in and try again", "/urls");
+    res.sendToErrorPage(401, "You must be logged in to create a new short URL. Please Log in and try again", "/urls");
     return;
   }
   const shortURL = generateRandomString(6);
@@ -154,13 +154,13 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
   if (!userID) {
-    res.sendError(401, "You must be logged in to edit a tinyURL", "/urls");
+    res.sendToErrorPage(401, "You must be logged in to edit a tinyURL", "/urls");
     return;
   }
   const id = req.params.id;
   const availableURLs = urlsForUser(urlDatabase, userID);
   if (!availableURLs[id]) {
-    res.sendError(401, "You can only edit your own tiny URLs", "/urls");
+    res.sendToErrorPage(401, "You can only edit your own tiny URLs", "/urls");
     return;
   }
   const editLongURL = req.body.editLongURL;
@@ -171,13 +171,13 @@ app.post("/urls/:id", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   const userID = req.session.user_id;
   if (!userID) {
-    res.sendError(401, "You must be logged in to delete a tiny URL", "/urls");
+    res.sendToErrorPage(401, "You must be logged in to delete a tiny URL", "/urls");
     return;
   }
   const id = req.params.id;
   const availableURLs = urlsForUser(urlDatabase, userID);
   if (!availableURLs[id]) {
-    res.sendError(401, "You can only delete your own tiny URLs", "/urls");
+    res.sendToErrorPage(401, "You can only delete your own tiny URLs", "/urls");
     return;
   }
   delete urlDatabase[id];
@@ -186,7 +186,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 app.post("/login", (req, res) => {
   const renderError = () => {
-    res.sendError(403, "Invalid Account Info. Please Try again", "/login");
+    res.sendToErrorPage(403, "Invalid Account Info. Please Try again", "/login");
     return;
   };
 
@@ -221,12 +221,12 @@ app.post("/register", (req, res) => {
   const isDuplicateEmail = !!findUserWithEmail(users, email);
   
   if (!email || !password) {
-    res.sendError(400, "Invalid Registration info. Please return and try again.", "/register");
+    res.sendToErrorPage(400, "Invalid Registration info. Please return and try again.", "/register");
     return;
   }
 
   if (isDuplicateEmail) {
-    res.sendError(400, "Account already exists. For a new account please use a different email address.", "/register");
+    res.sendToErrorPage(400, "Account already exists. For a new account please use a different email address.", "/register");
     return;
   }
 
