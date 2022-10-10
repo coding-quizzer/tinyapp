@@ -23,13 +23,6 @@ app.use(cookieSession({
 
 app.use(express.urlencoded({extended: true}));
 
-// Add the current user object to res.user
-app.use((req, res, next) => {
-  const userID = req.session.user_id;
-  res.user = users[userID];
-  next();
-});
-
 // Assign function that routes errors to the error path as res.sendToErrorPage method
 app.use((req, res, next) => {
   res.sendToErrorPage = (statusCode, message, path) => {
@@ -60,21 +53,25 @@ app.get("/urls", (req, res) => {
     res.sendToErrorPage(401, "Please log in to access tinyURLs.", "/urls");
     return;
   }
+  const user = users[userID];
 
   const availableURLs = urlsForUser(urlDatabase, userID);
   const templateVars = {
-    user: res.user,
+    user,
     urls: availableURLs,
   };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  if (!req.session.user_id) {
+  const userID = req.session.user_id;
+  if (!userID) {
     res.redirect("/login");
     return;
   }
-  const templateVars = { user: res.user};
+
+  const user = user[userID];
+  const templateVars = { user };
   res.render("urls_new", templateVars);
 });
 
@@ -89,11 +86,12 @@ app.get("/urls/:id", (req, res) => {
     res.sendToErrorPage(401, `Tiny URL ${id} is not available for you. If you want to edit or view a short URL for a website, you will have to make it yourself.`, "/urls");
     return;
   }
+  const user = users[userID];
   
   const templateVars = {
+    user,
     id,
     longURL: urlDatabase[id].longURL,
-    user: res.user
   };
   res.render("urls_show.ejs", templateVars);
 });
@@ -127,11 +125,13 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/:main/error/:status/:message", (req, res) => {
+
   const { status, message } = req.params;
-  const intStatus = parseInt(status);
+  const statusCode = parseInt(status);
   const decodedMessage = decodeURI(message);
-  const user = res.user;
-  res.status(intStatus).render("error_page", { user, statusCode: intStatus, message: decodedMessage});
+  const userID = req.session.user_id;
+  const user = users[userID];
+  res.status(statusCode).render("error_page", { user, statusCode, message: decodedMessage});
 });
 
 /**
