@@ -1,6 +1,7 @@
 const express = require("express");
 const cookieSession = require('cookie-session');
 const { generateRandomString, findUserWithEmail, urlsForUser } = require('./helpers');
+const { users, urlDatabase } = require('./databases');
 
 const bcrypt = require('bcryptjs');
 
@@ -9,40 +10,6 @@ const PORT = 8080; //default port 8080
 
 
 app.set("view engine", "ejs");
-
-/**
- * Set up databases
- */
-
-const users = {
-  userRandomID: {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: bcrypt.hashSync("purple-monkey=dinosaur")
-  },
-  user2RandomID: {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: bcrypt.hashSync("dishwasher-funk"),
-  },
-};
-
-const urlDatabase = {
-  "b2xVn2": {
-    longURL: "http://www.lighthouselabs.ca",
-    userID: "userRandomID",
-  },
-
-  "9sm5xK": {
-    longURL: "http://google.com",
-    userID: "user2RandomID"
-  }
-};
-
-/**
- * Helper functions
- */
-
 
 /**
  * Middleware
