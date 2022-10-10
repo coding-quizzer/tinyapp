@@ -13,17 +13,17 @@ const findUserWithEmail = function(userDatabase, email) {
   return null;
 }
 
-const urlsForUser = function(urlDatabase, id) {
+const urlsForUser = function(urlDatabase, userID) {
+  const userURLs = {};
   let urlKeys = Object.keys(urlDatabase);
-  // filter the keys
-  const validKeys = urlKeys.filter(urlKey => urlDatabase[urlKey].userID === id);
-  const validURLs = validKeys.map(validKey => {
-    const url = urlDatabase[validKey];
-    url.id = validKey;
-    return url;
-  });
-
-  return validURLs;
+  for (let key of urlKeys) {
+    let urlObj = urlDatabase[key];
+    if (urlObj.userID === userID) {
+      userURLs[key] = urlObj;
+    }
+  }
+  
+  return userURLs;
 };
 
 module.exports = { findUserWithEmail, urlsForUser, generateRandomString};

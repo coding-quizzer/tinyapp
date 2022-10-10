@@ -86,8 +86,7 @@ app.get("/urls/:id", (req, res) => {
   }
   const id = req.params.id;
   const availableURLs = urlsForUser(urlDatabase, userID);
-  const availableKeys = availableURLs.map(url => url.id);
-  if (!availableKeys.includes(id)) {
+  if (!availableURLs[id]) {
     res.sendError(401, `Tiny URL ${id} is not available for you. If you want to edit or view a short URL for a website, you will have to make it yourself.`, "/urls");
     return;
   }
@@ -159,9 +158,8 @@ app.post("/urls/:id", (req, res) => {
     return;
   }
   const id = req.params.id;
-  const availableUrls = urlsForUser(urlDatabase, userID);
-  const availableKeys = availableUrls.map(url => url.id);
-  if (!availableKeys.includes(id)) {
+  const availableURLs = urlsForUser(urlDatabase, userID);
+  if (!availableURLs[id]) {
     res.sendError(401, "You can only edit your own tiny URLs", "/urls");
     return;
   }
@@ -178,8 +176,7 @@ app.post("/urls/:id/delete", (req, res) => {
   }
   const id = req.params.id;
   const availableURLs = urlsForUser(urlDatabase, userID);
-  const availableKeys = availableURLs.map(url => url.id);
-  if (!availableKeys.includes(id)) {
+  if (!availableURLs[id]) {
     res.sendError(401, "You can only delete your own tiny URLs", "/urls");
     return;
   }
