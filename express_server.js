@@ -70,7 +70,7 @@ app.get("/urls/new", (req, res) => {
     return;
   }
 
-  const user = user[userID];
+  const user = users[userID];
   const templateVars = { user };
   res.render("urls_new", templateVars);
 });
