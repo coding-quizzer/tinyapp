@@ -215,19 +215,22 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   const newUserID = generateRandomString(6);
   const email = req.body.email;
-  const password = bcrypt.hashSync(req.body.password, 10);
+
   const isDuplicateEmail = !!findUserWithEmail(users, email);
   
-  if (!email || !password) {
+  if (!email || !req.body.password) {
     res.sendToErrorPage(400, "Invalid Registration info. Please return and try again.", "/register");
     return;
   }
 
+  
   if (isDuplicateEmail) {
     res.sendToErrorPage(400, "Account already exists. For a new account please use a different email address.", "/register");
     return;
   }
-
+  
+  const password = bcrypt.hashSync(req.body.password, 10);
+  
   users[newUserID] = {id: newUserID, email, password};
   req.session.user_id = newUserID;
   res.redirect("/urls");
